@@ -1,3 +1,4 @@
+import { Info } from "lucide-react";
 import type { DetailedCoinData } from "../../types/types";
 
 interface CoinDescriptionProps {
@@ -9,7 +10,8 @@ const CoinDescription = ({ coin }: CoinDescriptionProps) => {
 
     return (
         <div className="bg-white p-2">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
+            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <Info size={20} />
                 About {coin.name}
             </h2>
             <div

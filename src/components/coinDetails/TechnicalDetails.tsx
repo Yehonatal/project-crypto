@@ -7,7 +7,7 @@ interface TechnicalDetailsProps {
 
 const TechnicalDetails = ({ coin }: TechnicalDetailsProps) => {
     return (
-        <div className="bg-white p-6">
+        <div className="bg-white p-2 mb-10">
             <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <Code size={20} />
                 Technical Details

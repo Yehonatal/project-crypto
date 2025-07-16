@@ -68,7 +68,6 @@ app.get(
 
             // Extract the path after /api/coingecko/
             const apiPath = req.path.replace("/api/coingecko/", "");
-            console.log(`API Request: ${apiPath} with params:`, req.query);
 
             // First check if we have the API key
             if (!process.env.VITE_API_KEY) {
@@ -79,7 +78,6 @@ app.get(
             }
 
             const apiUrl = `https://api.coingecko.com/api/v3/${apiPath}`;
-            console.log(`Making request to: ${apiUrl}`);
 
             const response = await axios.get(apiUrl, {
                 params: req.query,
@@ -95,7 +93,6 @@ app.get(
             res.setHeader("X-RateLimit-Remaining", "100");
             res.setHeader("X-RateLimit-Reset", Date.now() + 15 * 60 * 1000);
 
-            console.log(`API Response status: ${response.status}`);
             res.json(response.data);
         } catch (error) {
             console.error("API Error:", error.message);
@@ -116,7 +113,6 @@ app.get(
                         details: error.response.data,
                     });
                 } else if (error.request) {
-                    console.error("API Request Error: No response received");
                     return res.status(504).json({
                         error: "Gateway Timeout - No response from API",
                     });
