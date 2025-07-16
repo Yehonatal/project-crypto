@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import {
     LineChart,
@@ -60,67 +61,71 @@ const CoinCard = ({ coin }: { coin: CoinData }) => {
     }, [showMore, coin.id, chartData]);
 
     return (
-        <li className="relative bg-white border-2 border-b-5 rounded-2xl border-gray-300 xl-glow p-4 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between overflow-hidden">
+        <>
             {/* Main Card Content */}
-            <div
-                className={`transition-opacity ${
-                    showMore ? "opacity-40" : "opacity-100"
-                }`}
-            >
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                        <img
-                            src={coin.image}
-                            alt={coin.name}
-                            className="w-10 h-10 object-contain"
-                        />
-                        <div>
-                            <h2 className="text-lg font-bold text-gray-800">
-                                {coin.name}
-                            </h2>
-                            <p className="text-sm text-gray-500">
-                                💎 {coin.symbol.toUpperCase()}
+            <Link to={`/coin/${coin.id}`}>
+                <div
+                    className={`transition-opacity ${
+                        showMore ? "opacity-40" : "opacity-100"
+                    }`}
+                >
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                            <img
+                                src={coin.image}
+                                alt={coin.name}
+                                className="w-10 h-10 object-contain"
+                            />
+                            <div>
+                                <h2 className="text-lg font-bold text-gray-800">
+                                    {coin.name}
+                                </h2>
+                                <p className="text-sm text-gray-500">
+                                    💎 {coin.symbol.toUpperCase()}
+                                </p>
+                            </div>
+                        </div>
+                        <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full font-extrabold">
+                            Rank #{coin.market_cap_rank}
+                        </span>
+                    </div>
+
+                    <div className="mb-4 flex items-top gap-4">
+                        <p className="text-xl font-semibold text-gray-800 mb-1">
+                            💰 ${coin.current_price.toLocaleString()}
+                        </p>
+                        <p
+                            className={`text-sm font-medium ${
+                                coin.price_change_percentage_24h >= 0
+                                    ? "text-green-600"
+                                    : "text-red-600"
+                            }`}
+                        >
+                            ⚡ 24h:{" "}
+                            {coin.price_change_percentage_24h.toFixed(2)}%
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 text-sm text-gray-600 mb-4">
+                        <div className="bg-gray-50 p-3">
+                            <p className="text-xs text-gray-500 mb-1">
+                                Market Cap
+                            </p>
+                            <p className="font-semibold text-gray-800">
+                                ${coin.market_cap.toLocaleString()}
+                            </p>
+                        </div>
+                        <div className="bg-gray-50 p-3">
+                            <p className="text-xs text-gray-500 mb-1">
+                                Volume (24h)
+                            </p>
+                            <p className="font-semibold text-gray-800">
+                                ${coin.total_volume.toLocaleString()}
                             </p>
                         </div>
                     </div>
-                    <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full font-extrabold">
-                        Rank #{coin.market_cap_rank}
-                    </span>
                 </div>
-
-                <div className="mb-4 flex items-top gap-4">
-                    <p className="text-xl font-semibold text-gray-800 mb-1">
-                        💰 ${coin.current_price.toLocaleString()}
-                    </p>
-                    <p
-                        className={`text-sm font-medium ${
-                            coin.price_change_percentage_24h >= 0
-                                ? "text-green-600"
-                                : "text-red-600"
-                        }`}
-                    >
-                        ⚡ 24h: {coin.price_change_percentage_24h.toFixed(2)}%
-                    </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 text-sm text-gray-600 mb-4">
-                    <div className="bg-gray-50 p-3">
-                        <p className="text-xs text-gray-500 mb-1">Market Cap</p>
-                        <p className="font-semibold text-gray-800">
-                            ${coin.market_cap.toLocaleString()}
-                        </p>
-                    </div>
-                    <div className="bg-gray-50 p-3">
-                        <p className="text-xs text-gray-500 mb-1">
-                            Volume (24h)
-                        </p>
-                        <p className="font-semibold text-gray-800">
-                            ${coin.total_volume.toLocaleString()}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
+            </Link>
             {/* Toggle Button */}
             <div className="flex justify-end z-20">
                 <button
@@ -134,7 +139,6 @@ const CoinCard = ({ coin }: { coin: CoinData }) => {
                     )}
                 </button>
             </div>
-
             {/* Glass Overlay with Chart */}
             {showMore && (
                 <div className="absolute inset-0 z-30 bg-black/5 backdrop-blur-sm xl-glow p-6 flex flex-col justify-between  animate-fadeIn text-gray-800">
@@ -207,17 +211,19 @@ const CoinCard = ({ coin }: { coin: CoinData }) => {
                             </p>
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-gray-800">
-                                {coin.name}
-                            </h2>
-                            <p className="text-sm text-gray-500">
-                                💎 {coin.symbol.toUpperCase()}
-                            </p>
+                            <Link to={`/coin/${coin.id}`}>
+                                <h2 className="text-lg font-bold text-gray-800">
+                                    {coin.name}
+                                </h2>
+                                <p className="text-sm text-gray-500">
+                                    💎 {coin.symbol.toUpperCase()}
+                                </p>
+                            </Link>
                         </div>
                     </div>
                 </div>
             )}
-        </li>
+        </>
     );
 };
 

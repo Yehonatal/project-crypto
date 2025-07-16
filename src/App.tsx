@@ -14,6 +14,7 @@ import ROICalculator from "./pages/roiCalculatorPage";
 import TopMovers from "./pages/topMoversPage";
 import TimeLine from "./pages/timelinePage";
 import NotFound from "./pages/notFoundPage";
+import CoinDetailsPage from "./pages/coinDetailsPage";
 
 function App() {
     const [coins, setCoins] = useState<CoinData[]>([]);
@@ -83,6 +84,7 @@ function App() {
                                 </>
                             }
                         />
+                        <Route path="/coin/:id" element={<CoinDetailsPage />} />
                         <Route path="/compare" element={<Compare />} />
                         <Route path="/top_movers" element={<TopMovers />} />
                         <Route

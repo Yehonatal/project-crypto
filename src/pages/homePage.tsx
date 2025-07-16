@@ -55,7 +55,9 @@ const Home = ({ order, filter, setOrder, setLimit, coins }: HomeProp) => {
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredCoins.length > 0 ? (
                     filteredCoins.map((coin: CoinData) => (
-                        <CryptoCard key={coin.id} coin={coin} />
+                        <li className="relative bg-white border-2 border-b-5 rounded-2xl border-gray-300 xl-glow p-4 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between overflow-hidden">
+                            <CryptoCard key={coin.id} coin={coin} />
+                        </li>
                     ))
                 ) : (
                     <div>
