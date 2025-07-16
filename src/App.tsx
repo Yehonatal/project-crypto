@@ -49,7 +49,7 @@ function App() {
 
     return (
         <>
-            <div className="max-w-[1424px] mx-auto">
+            <div className="max-w-[1224px] mx-auto">
                 <Header filter={filter} onFilterChange={setFiltered} />
                 <div className="min-h-screen py-10 px-6">
                     {loading && (
