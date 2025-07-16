@@ -1,12 +1,13 @@
 import { AlertCircle, Loader2 } from "lucide-react";
 import { type StatusMessageProps } from "../types/types";
+import { Link } from "react-router";
 
 const StatusMessage = ({ type, message }: StatusMessageProps) => {
     const baseClasses =
         "flex flex-col items-center justify-center gap-4 px-6 py-10 ";
 
     const textBase =
-        "text-center text-base sm:text-lg font-semibold leading-relaxed";
+        "text-center text-2xl sm:text-lg font-semibold leading-relaxed";
 
     if (type === "loading") {
         return (
@@ -34,6 +35,34 @@ const StatusMessage = ({ type, message }: StatusMessageProps) => {
                 <p className={`${textBase} text-red-600`}>
                     {message || "Oops! Something went wrong 😓"}
                 </p>
+            </div>
+        );
+    }
+
+    if (type === "404") {
+        return (
+            <div className={baseClasses + " bg-yellow-50/60"}>
+                <div className="relative w-12 h-12">
+                    <div className="absolute inset-0 rounded-full bg-yellow-100 animate-ping opacity-50" />
+                    <div className="relative z-10 p-2 bg-yellow-100 rounded-full shadow-inner">
+                        <span
+                            role="img"
+                            aria-label="lost"
+                            className="text-yellow-600 text-xl"
+                        >
+                            🧭
+                        </span>
+                    </div>
+                </div>
+                <p className={`${textBase} text-yellow-700`}>
+                    Page not found. You may be lost in the blockchain 🌐
+                </p>
+                <Link
+                    to="/"
+                    className="text-sm font-extrabold text-blue-600 hover:underline transition-all"
+                >
+                    ← Back to homepage
+                </Link>
             </div>
         );
     }

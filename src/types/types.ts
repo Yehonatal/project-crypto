@@ -25,6 +25,6 @@ export interface ComingSoonPageProps {
 }
 
 export interface StatusMessageProps {
-    type: "loading" | "error";
+    type: "loading" | "error" | "404";
     message?: string;
 }

@@ -60,7 +60,7 @@ const CoinCard = ({ coin }: { coin: CoinData }) => {
     }, [showMore, coin.id, chartData]);
 
     return (
-        <li className="relative bg-white border-2 border-b-4 rounded-2xl border-gray-200 xl-glow p-4 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between overflow-hidden">
+        <li className="relative bg-white border-2 border-b-5 rounded-2xl border-gray-300 xl-glow p-4 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between overflow-hidden">
             {/* Main Card Content */}
             <div
                 className={`transition-opacity ${

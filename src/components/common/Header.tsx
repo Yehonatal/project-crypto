@@ -1,5 +1,6 @@
 import { Search, Star } from "lucide-react";
 import TopBar from "./TopBar.tsx";
+import { Link } from "react-router";
 
 interface SearchCoin {
     filter: string;
@@ -14,36 +15,37 @@ const Header = ({ filter, onFilterChange }: SearchCoin) => {
                 {/* Left: Logo + Nav Links */}
                 <div className="flex items-center gap-8">
                     {/* Logo */}
-                    <div className="flex items-center gap-2">
-                        <p className="text-lg font-semibold text-black">💰 </p>
-                        <span className="text-lg font-semibold text-black">
-                            Project Crypto
-                        </span>
-                    </div>
+                    <Link to="/">
+                        <div className="flex items-center gap-2">
+                            <p className="text-lg font-semibold text-black">
+                                💰{" "}
+                            </p>
+                            <span className="text-lg font-semibold text-black">
+                                Project Crypto
+                            </span>
+                        </div>
+                    </Link>
 
                     {/* Navigation Links */}
                     <nav className="hidden md:flex items-center gap-6 font-bold text-gray-600">
-                        <a href="#" className="hover:text-black">
-                            Dashboard
-                        </a>
-                        <a href="#" className="hover:text-black">
+                        <Link to="/compare" className="hover:text-black">
                             Compare
-                        </a>
-                        <a href="#" className="hover:text-black">
+                        </Link>
+                        <Link to="/top_movers" className="hover:text-black">
                             Top Movers
-                        </a>
-                        <a href="#" className="hover:text-black">
+                        </Link>
+                        <Link to="/roi_calculator" className="hover:text-black">
                             ROI Calculator
-                        </a>
-                        <a href="#" className="hover:text-black">
+                        </Link>
+                        <Link to="/timeline" className="hover:text-black">
                             Timeline
-                        </a>
-                        <a href="#" className="hover:text-black">
+                        </Link>
+                        <Link to="/education" className="hover:text-black">
                             Education
-                        </a>
-                        <a href="#" className="hover:text-black">
+                        </Link>
+                        <Link to="/news" className="hover:text-black">
                             News
-                        </a>
+                        </Link>
                     </nav>
                 </div>
 
@@ -51,13 +53,13 @@ const Header = ({ filter, onFilterChange }: SearchCoin) => {
                 <div className="flex items-center gap-4 ">
                     {/* Feature Links */}
                     <div className="hidden sm:flex items-center gap-3">
-                        <a
-                            href="#"
+                        <Link
+                            to="/portfolio"
                             className="flex items-center gap-1 hover:text-black  font-bold"
                         >
                             <Star size={16} className="text-yellow-400" />
                             Portfolio
-                        </a>
+                        </Link>
                     </div>
 
                     {/* Search Input */}

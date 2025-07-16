@@ -1,10 +1,19 @@
 import { useState, useEffect } from "react";
 import { type CoinData } from "./types/types";
-import Header from "./components/common/Header";
 
-import Dashboard from "./pages/Dashboard";
-import Compare from "./pages/Compare";
+import Home from "./pages/homePage";
+import Header from "./components/common/Header";
 import StatusMessage from "./ui/StatusMessage";
+
+import { Routes, Route } from "react-router";
+import Compare from "./pages/comparePage";
+import Education from "./pages/educationPage";
+import News from "./pages/newsPage";
+import Portfolio from "./pages/portfolioPage";
+import ROICalculator from "./pages/roiCalculatorPage";
+import TopMovers from "./pages/topMoversPage";
+import TimeLine from "./pages/timelinePage";
+import NotFound from "./pages/notFoundPage";
 
 function App() {
     const [coins, setCoins] = useState<CoinData[]>([]);
@@ -37,65 +46,58 @@ function App() {
         fetchData();
     }, [limit]);
 
-    const filteredCoins = coins
-        .filter((coin) => {
-            return (
-                coin.name.toLowerCase().includes(filter.toLowerCase()) ||
-                coin.symbol.toLowerCase().includes(filter.toLowerCase())
-            );
-        })
-        .slice()
-        .sort((a: CoinData, b: CoinData): number => {
-            switch (order) {
-                case "market_cap_desc":
-                    return b.market_cap - a.market_cap;
-                case "market_cap_asc":
-                    return a.market_cap - b.market_cap;
-                case "price_desc":
-                    return b.current_price - a.current_price;
-                case "price_asc":
-                    return a.current_price - b.current_price;
-                case "change_desc":
-                    return (
-                        b.price_change_percentage_24h -
-                        a.price_change_percentage_24h
-                    );
-                case "change_asc":
-                    return (
-                        a.price_change_percentage_24h -
-                        b.price_change_percentage_24h
-                    );
-                default:
-                    return 0;
-            }
-        });
-
     return (
-        <div className="max-w-[1424px] mx-auto">
-            <Header filter={filter} onFilterChange={setFiltered} />
-            <div className="min-h-screen py-10 px-6">
-                {loading && (
-                    <StatusMessage
-                        type="loading"
-                        message="Fetching latest crypto data..."
-                    />
-                )}
-
-                {error && <StatusMessage type="error" message={error} />}
-                {!loading && !error && (
-                    <>
-                        {" "}
-                        <Dashboard
-                            order={order}
-                            setOrder={setOrder}
-                            setLimit={setLimit}
-                            filteredCoins={filteredCoins}
+        <>
+            <div className="max-w-[1424px] mx-auto">
+                <Header filter={filter} onFilterChange={setFiltered} />
+                <div className="min-h-screen py-10 px-6">
+                    {loading && (
+                        <StatusMessage
+                            type="loading"
+                            message="Fetching latest crypto data..."
                         />
-                        <Compare />
-                    </>
-                )}
+                    )}
+                    <Routes>
+                        <Route
+                            path="/"
+                            element={
+                                <>
+                                    {error && (
+                                        <StatusMessage
+                                            type="error"
+                                            message={error}
+                                        />
+                                    )}
+                                    {!loading && !error && (
+                                        <>
+                                            {" "}
+                                            <Home
+                                                order={order}
+                                                setOrder={setOrder}
+                                                setLimit={setLimit}
+                                                coins={coins}
+                                                filter={filter}
+                                            />
+                                        </>
+                                    )}
+                                </>
+                            }
+                        />
+                        <Route path="/compare" element={<Compare />} />
+                        <Route path="/top_movers" element={<TopMovers />} />
+                        <Route
+                            path="/roi_calculator"
+                            element={<ROICalculator />}
+                        />
+                        <Route path="/education" element={<Education />} />
+                        <Route path="/timeline" element={<TimeLine />} />
+                        <Route path="/news" element={<News />} />
+                        <Route path="/portfolio" element={<Portfolio />} />
+                        <Route path="*" element={<NotFound />} />
+                    </Routes>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 
