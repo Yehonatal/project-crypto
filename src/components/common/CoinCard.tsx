@@ -8,8 +8,8 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from "recharts";
-import type { MarketChartData } from "../types/types";
-import type { CoinData } from "../types/types";
+import type { MarketChartData } from "../../types/types";
+import type { CoinData } from "../../types/types";
 import axios from "axios";
 
 const CoinCard = ({ coin }: { coin: CoinData }) => {

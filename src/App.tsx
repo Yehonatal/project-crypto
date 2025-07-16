@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { type CoinData } from "./types/types";
-import CryptoCard from "./components/CoinCard";
-import Header from "./components/Header";
-import LimitSelector from "./components/LimitSelector";
-import OrderSelector from "./components/OrderSelector";
+import Header from "./components/common/Header";
+
+import Dashboard from "./pages/Dashboard";
+import Compare from "./pages/Compare";
+import StatusMessage from "./ui/StatusMessage";
 
 function App() {
     const [coins, setCoins] = useState<CoinData[]>([]);
@@ -74,39 +75,23 @@ function App() {
             <Header filter={filter} onFilterChange={setFiltered} />
             <div className="min-h-screen py-10 px-6">
                 {loading && (
-                    <p className="text-center text-blue-600 font-medium animate-pulse">
-                        Loading...
-                    </p>
+                    <StatusMessage
+                        type="loading"
+                        message="Fetching latest crypto data..."
+                    />
                 )}
 
-                {error && (
-                    <p className="text-center text-red-500 font-medium">
-                        {error}
-                    </p>
-                )}
-
+                {error && <StatusMessage type="error" message={error} />}
                 {!loading && !error && (
                     <>
                         {" "}
-                        <div className="flex items-center gap-2 mb-4 justify-end ">
-                            {/* Filter and Controls */}
-                            <OrderSelector
-                                sortBy={order}
-                                onSetOrder={setOrder}
-                            />
-                            <LimitSelector setLimit={setLimit} />
-                        </div>
-                        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredCoins.length > 0 ? (
-                                filteredCoins.map((coin) => (
-                                    <CryptoCard key={coin.id} coin={coin} />
-                                ))
-                            ) : (
-                                <div>
-                                    <h1>No coins found</h1>
-                                </div>
-                            )}
-                        </ul>
+                        <Dashboard
+                            order={order}
+                            setOrder={setOrder}
+                            setLimit={setLimit}
+                            filteredCoins={filteredCoins}
+                        />
+                        <Compare />
                     </>
                 )}
             </div>

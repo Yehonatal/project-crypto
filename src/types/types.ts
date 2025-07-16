@@ -18,3 +18,13 @@ export interface MarketChartData {
     timestamp: number;
     price: number;
 }
+
+export interface ComingSoonPageProps {
+    title: string;
+    description?: string;
+}
+
+export interface StatusMessageProps {
+    type: "loading" | "error";
+    message?: string;
+}
