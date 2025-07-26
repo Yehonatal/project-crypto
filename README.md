@@ -1,6 +1,11 @@
-# Project Crypto
+# Project Crypto (Inspired by CoinGecko) 
+ (InProgress)
 
 A modern, responsive cryptocurrency tracking application built with React, TypeScript, and Vite. Features real-time cryptocurrency data, interactive charts, and a sleek user interface inspired by popular crypto tracking platforms.
+
+
+![current home page](/frontend/public/homepage.png)
+![Coin details page](/frontend/public/coindetail.png)
 
 ## Features
 
