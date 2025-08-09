@@ -18,10 +18,19 @@ app.use(compression());
 // Configure CORS
 app.use(
     cors({
-        origin: [
-            "http://localhost:5173",
-            "https://project-crypto-pink.vercel.app",
-        ], // <-- Your React frontend URL here
+        origin: function (origin, callback) {
+            const allowedOrigins = [
+                "http://localhost:5173",
+                "http://localhost:4000",
+                "https://project-crypto-pink.vercel.app",
+            ];
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.indexOf(origin) !== -1) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization", "X-CG-API-Key"],
         credentials: true,
