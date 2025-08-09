@@ -15,133 +15,146 @@ const port = process.env.PORT || 4000;
 app.use(helmet());
 app.use(compression());
 
-// Rate limiting middleware
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+// Configure CORS
+app.use(
+  cors({
+    origin: "http://localhost:5173", // <-- Your React frontend URL here
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-CG-API-Key"],
+    credentials: true,
+  }),
+);
 
-app.use(cors());
+// Handle preflight OPTIONS requests
+app.options("*", cors());
+
+// Rate limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 app.use(limiter);
 
 // Cache middleware
 const cacheMiddleware = (duration) => {
-    return (req, res, next) => {
-        const key = "__express__" + req.originalUrl || req.url;
-        const cachedBody = cache.get(key);
-        if (cachedBody) {
-            res.send(cachedBody);
-            return;
-        } else {
-            res.sendResponse = res.send;
-            res.send = (body) => {
-                cache.put(key, body, duration * 1000);
-                res.sendResponse(body);
-            };
-            next();
-        }
+  return (req, res, next) => {
+    const key = "__express__" + (req.originalUrl || req.url);
+    const cachedBody = cache.get(key);
+    if (cachedBody) {
+      res.send(cachedBody);
+      return;
+    }
+    res.sendResponse = res.send;
+    res.send = (body) => {
+      cache.put(key, body, duration * 1000);
+      res.sendResponse(body);
     };
+    next();
+  };
 };
 
-// Request validation middleware
-const validateRequest = [
-    check("vs_currency").optional().isIn(["usd", "eur", "btc", "eth"]),
-    check("days").optional().isInt({ min: 1, max: 365 }),
-    check("page").optional().isInt({ min: 1 }),
-    check("per_page").optional().isInt({ min: 1, max: 100 }),
-];
+// Basic request validation middleware
+const validateRequest = (req, res, next) => {
+  const apiPath = req.path.replace("/api/coingecko/", "");
+  if (apiPath.startsWith("coins/markets") && !req.query.vs_currency) {
+    return res.status(400).json({ error: "Missing parameter vs_currency" });
+  }
+  if (
+    req.query.vs_currency &&
+    !["usd", "eur", "btc", "eth"].includes(req.query.vs_currency.toLowerCase())
+  ) {
+    return res.status(400).json({ error: "Invalid vs_currency value" });
+  }
+  next();
+};
 
-// Proxy endpoint for Coingecko API - handle all paths after /api/coingecko/
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
+// Proxy endpoint for CoinGecko API
 app.get(
-    "/api/coingecko/*",
-    cacheMiddleware(15 * 60),
-    validateRequest,
-    async (req, res) => {
-        try {
-            // Validate request
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({ errors: errors.array() });
-            }
+  "/api/coingecko/*",
+  cacheMiddleware(15 * 60),
+  validateRequest,
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-            // Extract the path after /api/coingecko/
-            const apiPath = req.path.replace("/api/coingecko/", "");
+      const apiPath = req.path.replace("/api/coingecko/", "");
+      const clientKey =
+        req.headers["x-cg-api-key"] || req.query.api_key || req.query.key;
+      const apiKey = clientKey || process.env.VITE_API_KEY;
 
-            // First check if we have the API key
-            if (!process.env.VITE_API_KEY) {
-                console.error("API key not configured");
-                return res.status(500).json({
-                    error: "API key not configured",
-                });
-            }
+      if (!apiKey) {
+        return res.status(500).json({
+          error:
+            "CoinGecko API key missing. Provide 'x-cg-api-key' header or set VITE_API_KEY.",
+        });
+      }
 
-            const apiUrl = `https://api.coingecko.com/api/v3/${apiPath}`;
+      const apiUrl = `https://api.coingecko.com/api/v3/${apiPath}`;
 
-            const response = await axios.get(apiUrl, {
-                params: req.query,
-                headers: {
-                    "X-CG-Demo-API-Key": process.env.VITE_API_KEY,
-                    Accept: "application/json",
-                    "User-Agent": "crypto-proxy/1.0.0",
-                },
-            });
+      // Remove our keys from query params before forwarding
+      const params = { ...req.query };
+      delete params.api_key;
+      delete params.key;
 
-            // Add rate limit headers
-            res.setHeader("X-RateLimit-Limit", "100");
-            res.setHeader("X-RateLimit-Remaining", "100");
-            res.setHeader("X-RateLimit-Reset", Date.now() + 15 * 60 * 1000);
+      const response = await axios.get(apiUrl, {
+        params,
+        headers: {
+          "X-CG-Demo-API-Key": apiKey,
+          Accept: "application/json",
+          "User-Agent": "crypto-proxy/1.0.0",
+        },
+      });
 
-            res.json(response.data);
-        } catch (error) {
-            console.error("API Error:", error.message);
+      res.setHeader("X-RateLimit-Limit", "100");
+      res.setHeader("X-RateLimit-Remaining", "100");
+      res.setHeader("X-RateLimit-Reset", Date.now() + 15 * 60 * 1000);
 
-            // Handle different error types
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    console.error(
-                        "API Response Error:",
-                        error.response.status,
-                        error.response.data
-                    );
-                    return res.status(error.response.status).json({
-                        error:
-                            error.response.data?.error ||
-                            error.response.data?.message ||
-                            "API Error",
-                        details: error.response.data,
-                    });
-                } else if (error.request) {
-                    return res.status(504).json({
-                        error: "Gateway Timeout - No response from API",
-                    });
-                }
-            }
-
-            console.error("Unexpected error:", error);
-            res.status(500).json({
-                error: "Internal Server Error",
-                message: error.message,
-            });
+      res.json(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          return res.status(error.response.status).json({
+            error:
+              error.response.data?.error ||
+              error.response.data?.message ||
+              "API Error",
+            details: error.response.data,
+          });
+        } else if (error.request) {
+          return res
+            .status(504)
+            .json({ error: "Gateway Timeout - No response from API" });
         }
+      }
+      res
+        .status(500)
+        .json({ error: "Internal Server Error", message: error.message });
     }
+  },
 );
 
-// Error handling middleware
+// General error handler
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        error: "Internal Server Error",
-    });
+  console.error(err.stack);
+  res.status(500).json({ error: "Internal Server Error" });
 });
 
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-    console.log("Security features enabled:");
-    console.log("- Rate limiting (100 requests per 15 minutes)");
-    console.log("- Response caching (15 minutes)");
-    console.log("- Request validation");
-    console.log("- Security headers via Helmet");
-    console.log("- Compression enabled");
+  console.log(`Server running on port ${port}`);
+  console.log("Security features enabled:");
+  console.log("- Rate limiting (100 requests per 15 minutes)");
+  console.log("- Response caching (15 minutes)");
+  console.log("- Request validation");
+  console.log("- Security headers via Helmet");
+  console.log("- Compression enabled");
 });

@@ -1,0 +1,50 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: crypto-backend-dev
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+    env_file:
+      - ./backend/.env
+    volumes:
+      # Mount source code for live updates
+      - ./backend:/app
+      # Exclude node_modules to avoid conflicts
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - crypto-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: crypto-frontend-dev
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:4000
+      - NODE_OPTIONS=--max-old-space-size=4096
+    volumes:
+      # Mount source code for live updates
+      - ./frontend:/app
+      # Exclude node_modules to avoid conflicts
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - crypto-network
+
+networks:
+  crypto-network:
+    driver: bridge
+
+volumes:
+  # Volume for persistent data if needed
+  crypto-data:

@@ -1,0 +1,35 @@
+# Development Dockerfile for Node.js backend with hot reloading
+FROM node:20-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Install pnpm globally
+RUN npm install -g pnpm
+
+# Copy package.json and pnpm-lock.yaml
+COPY package.json pnpm-lock.yaml* ./
+
+# Install dependencies
+RUN pnpm install
+
+# Copy the rest of the application code
+# Note: In development, source code will be mounted as a volume
+COPY . .
+
+# Create a non-root user for security
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S backend -u 1001 -G nodejs
+
+# Change ownership of the app directory to the nodejs user
+RUN chown -R backend:nodejs /app
+USER backend
+
+# Expose the port the app runs on
+EXPOSE 4000
+
+# Define environment variable
+ENV NODE_ENV=development
+
+# Start the development server with nodemon for hot reloading
+CMD ["pnpm", "dev"]
