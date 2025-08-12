@@ -18,10 +18,7 @@ app.use(compression());
 // Configure CORS
 app.use(
     cors({
-        origin: [
-            "http://localhost:5173",
-            "https://project-crypto-pink.vercel.app",
-        ],
+        origin: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization", "X-CG-API-Key"],
         credentials: true,
