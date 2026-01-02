@@ -18,10 +18,19 @@ app.use(compression());
 // Configure CORS
 app.use(
     cors({
-        origin: [
-            "http://localhost:5173",
-            "https://project-crypto-pink.vercel.app",
-        ],
+        origin: function (origin, callback) {
+            const allowedOrigins = [
+                "http://localhost:5173",
+                "http://localhost:4000",
+                "https://project-crypto-pink.vercel.app",
+            ];
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.indexOf(origin) !== -1) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization", "X-CG-API-Key"],
         credentials: true,
@@ -97,11 +106,11 @@ app.get(
                 req.headers["x-cg-api-key"] ||
                 req.query.api_key ||
                 req.query.key;
-            const apiKey = clientKey || process.env.VITE_API_KEY;
+            const apiKey = clientKey || process.env.COINGECKO_API_KEY;
 
             if (!apiKey) {
                 return res.status(500).json({
-                    error: "CoinGecko API key missing. Provide 'x-cg-api-key' header or set VITE_API_KEY.",
+                    error: "CoinGecko API key missing. Provide 'x-cg-api-key' header or set COINGECKO_API_KEY.",
                 });
             }
 

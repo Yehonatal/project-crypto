@@ -16,10 +16,11 @@ interface HomeProp {
     coins: CoinData[];
 }
 
-const Home = ({ order, filter, setOrder, setLimit, coins }: HomeProp) => {
+const Home = ({ order, filter, setOrder, setLimit, coins = [] }: HomeProp) => {
     const [viewMode, setViewMode] = useState<"cards" | "table">("table");
     const [activeCategory, setActiveCategory] = useState("all");
     const navigate = useNavigate();
+
     const filteredCoins = coins
         .filter((coin) => {
             return (

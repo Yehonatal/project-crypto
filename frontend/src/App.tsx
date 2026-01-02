@@ -36,7 +36,11 @@ function App() {
                 );
                 if (!response.ok) throw new Error("Failed to fetch data");
                 const data = await response.json();
-                setCoins(data);
+                if (Array.isArray(data)) {
+                    setCoins(data);
+                } else {
+                    throw new Error("Invalid data format received from API");
+                }
                 setLoading(false);
                 setError(null);
             } catch (err: Error | unknown) {
@@ -87,7 +91,10 @@ function App() {
                         />
                         <Route path="/coin/:id" element={<CoinDetailsPage />} />
                         <Route path="/compare" element={<Compare />} />
-                        <Route path="/crypto-highlights" element={<CryptoHighlightsPage />} />
+                        <Route
+                            path="/crypto-highlights"
+                            element={<CryptoHighlightsPage />}
+                        />
                         <Route path="/top_movers" element={<TopMovers />} />
                         <Route
                             path="/roi_calculator"
