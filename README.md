@@ -5,8 +5,11 @@ A modern, responsive cryptocurrency tracking application built with React, TypeS
 
 
 ![current home page](/frontend/public/homepage.png)
+![Compare coins page](/frontend/public/comparepage.png)
+![Profile page](/frontend/public/profilepage.png)
 ![Coin details page](/frontend/public/coindetail.png)
 ![Coin education page](/frontend/public/edupage.png)
+
 
 ## Features
 
